@@ -1,0 +1,9 @@
+# Self-publish homelab-control (optional). Credentials live in the data plane.
+registry: docker.io
+namespace: jonasrosland
+secrets: config/secrets/dockerhub.yml
+
+images:
+  homelab-control:
+    local: homelab/control:local
+    push: true

@@ -36,8 +36,18 @@ def _homelab_manifest() -> dict:
 
 
 def verify_control_pin() -> None:
-    """Ensure control checkout matches homelab.yml paths and optional git.control_ref."""
+    """Ensure control image or git checkout matches homelab.yml pins."""
     manifest = _homelab_manifest()
+    control = manifest.get("control") or {}
+    if hp.control_mode() == "container" or str(control.get("mode") or "").lower() == "container":
+        want = str(control.get("image") or "").strip()
+        running = str(os.environ.get("HOMELAB_CONTROL_IMAGE") or "").strip()
+        if want and running and want != running:
+            raise RuntimeError(
+                f"homelab.yml control.image is {want!r} but container runs {running!r}"
+            )
+        return
+
     paths = manifest.get("paths") or {}
     want_root = paths.get("control_root")
     if want_root:
@@ -52,6 +62,8 @@ def verify_control_pin() -> None:
     if not ref:
         return
     cr = hp.control_root()
+    if not (cr / ".git").is_dir():
+        return
     head = subprocess.run(
         ["git", "-C", str(cr), "rev-parse", "HEAD"],
         check=True,

@@ -1,0 +1,28 @@
+# Copy to data repo stacks/homelab-control/ — see docs/container-runtime.md
+name: homelab-control
+
+services:
+  engine:
+    image: ${HOMELAB_CONTROL_IMAGE:?set HOMELAB_CONTROL_IMAGE}
+    user: "${HOMELAB_RUN_UID:?}:${HOMELAB_RUN_GID:?}"
+    group_add:
+      - "${DOCKER_GID:?}"
+    working_dir: /data
+    environment:
+      HOME: /home/runner
+      HOMELAB_DATA_ROOT: /data
+      HOMELAB_SERVICES_ROOT: /services
+      HOMELAB_CONTROL_ROOT: /opt/homelab/control
+      HOMELAB_CONTROL_CONTAINER: "1"
+      HOMELAB_CONTROL_MODE: container
+      HOMELAB_CONTROL_IMAGE: ${HOMELAB_CONTROL_IMAGE}
+      SOPS_AGE_KEY_FILE: /age.key
+      TZ: ${HOMELAB_TZ:-UTC}
+    volumes:
+      - ${HOMELAB_DATA_HOST:?}:/data
+      - ${HOMELAB_SERVICES_HOST:?}:/services
+      - ${HOMELAB_SECRETS_RUNTIME_HOST:-/run/homelab}:/run/homelab
+      - ${HOMELAB_AGE_KEY_HOST:?}:/age.key:ro
+      - ${HOMELAB_SSH_DIR_HOST:?}:/home/runner/.ssh:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: ["/opt/homelab/control/scripts/entrypoint.sh"]

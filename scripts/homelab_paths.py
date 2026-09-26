@@ -69,11 +69,30 @@ def resolve_data(p: str | Path) -> Path:
     return data_root() / path
 
 
+def control_mode() -> str:
+    """container (default in image) or git (host checkout)."""
+    env = os.environ.get("HOMELAB_CONTROL_MODE")
+    if env:
+        return env.strip().lower()
+    if os.environ.get("HOMELAB_CONTROL_CONTAINER") == "1":
+        return "container"
+    try:
+        manifest = _load_manifest(data_root())
+        mode = str((manifest.get("control") or {}).get("mode") or "").strip().lower()
+        if mode:
+            return mode
+    except RuntimeError:
+        pass
+    return "git"
+
+
 def control_root() -> Path:
-    """Checkout of homelab-control (this repo when deployed from control)."""
+    """Engine root — baked-in path in container, or git checkout on host."""
     env = os.environ.get("HOMELAB_CONTROL_ROOT")
     if env:
         return Path(env).resolve()
+    if control_mode() == "container":
+        return Path("/opt/homelab/control")
     try:
         data = data_root()
         manifest = _load_manifest(data)

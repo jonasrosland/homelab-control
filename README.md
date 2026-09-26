@@ -19,23 +19,20 @@ See [docs/control-data-plane.md](docs/control-data-plane.md) and [homelab-data-t
 - Python 3 + PyYAML
 - Data checkout with `config/deploy.yml` and `stacks/`
 
-## Split-repo layout
+## Container runtime (recommended)
+
+Build and publish the engine image; the **data plane** runs it via Compose (host needs Docker only):
 
 ```bash
-git clone git@github.com:jonasrosland/homelab-control.git /opt/homelab/control
-git clone git@github.com:YOU/homelab-data.git /opt/homelab/data
-
-cd /opt/homelab/control
-# Edit systemd/*.service paths if your clones differ, then:
-bash scripts/install-deploy-timer.sh
+docker build -t homelab/control:local .
+# push to your registry; pin control.image in data config/homelab.yml
 ```
 
-`systemd/deploy-from-git.service` sets:
+See [docs/container-runtime.md](docs/container-runtime.md). Saturn uses `scripts/homelab-control-run.sh` from the data repo (not a host git clone of this repo).
 
-- `WorkingDirectory` → control checkout
-- `HOMELAB_DATA_ROOT` → data checkout
+## Split-repo layout (git mode)
 
-The poller **pulls git only in the data repo**; it runs scripts from control.
+Optional: clone this repo on the host and set `control.mode: git` in `homelab.yml`. Container mode is preferred.
 
 ## Monorepo / dev
 
