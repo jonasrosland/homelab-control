@@ -1,0 +1,23 @@
+# Site manifest (data plane). Documents paths for control/data separation.
+# Copy to config/homelab.yml to customize; monorepo mode works without homelab.yml
+# (scripts default to the git checkout that contains config/deploy.yml).
+#
+# See docs/control-data-plane.md
+
+version: 1
+
+notify:
+  host_label: deploy
+
+git:
+  data_remote: origin
+  data_branch: main
+  # When control lives in a second repo, pin a tag or SHA (null = monorepo).
+  control_ref: null
+
+paths:
+  data_root: /opt/homelab/data
+  control_root: /opt/homelab/control
+  services_root: /var/lib/homelab/services
+  secrets_runtime: /run/homelab
+  generated: .generated

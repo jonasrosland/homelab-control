@@ -1,0 +1,26 @@
+# Data-plane deploy map (copy to config/deploy.yml in your private repo).
+remote: origin
+branch: main
+lock_file: .generated/deploy.lock
+
+git:
+  fetch_retries: 3
+  fetch_retry_seconds: 2
+
+health:
+  timeout_seconds: 120
+  poll_seconds: 2
+
+pre_deploy_backup: true
+
+stacks:
+  glance:
+    recreate: true
+    paths:
+      - stacks/glance/
+      - config/glance.yml
+
+notify:
+  on_failure: telegram
+  on_success: telegram
+  telegram_config: config/secrets/telegram.yml

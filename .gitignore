@@ -1,0 +1,35 @@
+# Secrets: SOPS-encrypted files under config/secrets/ ARE committed.
+# Never commit the age private key or plaintext backups.
+**/age.key
+config/secrets/*.plaintext
+config/secrets/.bak-*
+*.secret
+*.secret.*
+.env
+.env.*
+!.env.example
+
+# Generated from local deploy (non-secret artifacts OK; secret env files go to /run/homelab)
+.generated/
+
+# OpenTofu local state (PVE imports). Never commit.
+tofu/**/.terraform/
+tofu/**/*.tfstate
+tofu/**/*.tfstate.*
+
+# Python
+scripts/__pycache__/
+__pycache__/
+
+# OS / editor
+.DS_Store
+*.swp
+*~
+
+# Runtime bind mounts under stacks/ (LM Studio models, app DBs).
+# Compose must not use ./data inside the git clone — see deploy-stack.sh.
+stacks/*/data/
+
+# Node (local SRE build artifacts)
+**/node_modules/
+stacks/sre/dist/

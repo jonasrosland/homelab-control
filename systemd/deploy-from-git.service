@@ -1,0 +1,9 @@
+[Unit]
+Description=Poll data-plane git and deploy changed stacks (homelab-control)
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/homelab/control
+Environment=HOMELAB_DATA_ROOT=/opt/homelab/data
+ExecStart=/usr/bin/python3 /opt/homelab/control/scripts/deploy-from-git.py

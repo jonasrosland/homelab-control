@@ -1,0 +1,12 @@
+[Unit]
+Description=Poll lmstudio.ai for new llmster releases
+
+[Timer]
+OnBootSec=30min
+OnCalendar=*-*-* 05:00:00
+AccuracySec=15min
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,16 @@
+# Example Glance stack — bind-mount config from your data repo checkout.
+services:
+  glance:
+    image: glanceapp/glance:v0.8.6
+    container_name: glance
+    restart: unless-stopped
+    ports:
+      - "8085:8080"
+    volumes:
+      - ${HOMELAB_DATA_ROOT:-/opt/homelab/data}/config/glance.yml:/app/config/glance.yml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null --timeout=5 http://127.0.0.1:8080/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

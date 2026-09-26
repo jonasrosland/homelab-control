@@ -1,0 +1,10 @@
+[Unit]
+Description=Prepare restic dumps before Backrest nightly backup
+
+[Timer]
+OnCalendar=*-*-* 02:45:00
+Persistent=true
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target
