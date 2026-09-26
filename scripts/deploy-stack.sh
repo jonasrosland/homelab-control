@@ -17,6 +17,10 @@ if [[ -z "${SERVICES_ROOT:-}" ]]; then
   SERVICES_ROOT="$(PYTHONPATH="${CONTROL_ROOT}/scripts" python3 -c "import homelab_paths as hp; print(hp.services_root())" 2>/dev/null || true)"
 fi
 SERVICES_ROOT="${SERVICES_ROOT:-/var/lib/homelab/services}"
+DATA_HOST="${HOMELAB_DATA_HOST:-${HOMELAB_DATA_ROOT:-$REPO_ROOT}}"
+SERVICES_HOST="${HOMELAB_SERVICES_HOST:-${HOMELAB_SERVICES_ROOT:-$SERVICES_ROOT}}"
+export HOMELAB_DATA_HOST="$DATA_HOST"
+export HOMELAB_SERVICES_HOST="$SERVICES_HOST"
 REPO_STACK="${REPO_ROOT}/stacks/${STACK}"
 DIR="${SERVICES_ROOT}/${STACK}"
 
