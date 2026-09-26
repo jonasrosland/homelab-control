@@ -45,8 +45,20 @@ def rclone_serve_args(cfg: dict, config_path: Path) -> str:
     )
 
 
+def restic_binary(cfg: dict) -> Path:
+    configured = cfg.get("restic_bin")
+    if configured:
+        path = Path(str(configured))
+        if path.is_file():
+            return path
+    found = shutil.which("restic")
+    if found:
+        return Path(found)
+    return Path("/usr/bin/restic")
+
+
 def restic_cmd(cfg: dict, *args: str) -> list[str]:
-    binary = Path(cfg.get("restic_bin") or shutil.which("restic") or "restic")
+    binary = restic_binary(cfg)
     sys.path.insert(0, str(ROOT / "scripts"))
     from sops_secrets import decrypt_to
 
@@ -164,7 +176,7 @@ def collect_stack_configs(cfg: dict) -> Path | None:
     dest_rel = backup.get("stack_copy_dir")
     if not root or not dest_rel:
         return None
-    src_root = Path(root)
+    src_root = hp.host_path_to_runtime(root)
     dest_root = resolve(dest_rel)
     if dest_root.exists():
         shutil.rmtree(dest_root)
@@ -341,7 +353,7 @@ def cmd_backup(
     for pattern in cfg["backup"].get("exclude") or []:
         args.extend(["--exclude", str(pattern)])
     for path in backup_paths(cfg, include_heavy=include_heavy):
-        p = Path(path)
+        p = hp.host_path_to_runtime(path)
         if p.exists():
             args.append(str(p))
         else:

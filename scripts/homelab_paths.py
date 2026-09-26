@@ -69,6 +69,27 @@ def resolve_data(p: str | Path) -> Path:
     return data_root() / path
 
 
+def host_path_to_runtime(path: str | Path) -> Path:
+    """Map host paths from restic.yml to container mount paths (/data, /services)."""
+    p = Path(path)
+    if os.environ.get("HOMELAB_CONTROL_CONTAINER") != "1":
+        return p
+    s = str(p)
+    pairs: list[tuple[str, str]] = []
+    data_host = os.environ.get("HOMELAB_DATA_HOST")
+    data_root_env = os.environ.get("HOMELAB_DATA_ROOT")
+    if data_host and data_root_env:
+        pairs.append((data_host.rstrip("/"), data_root_env.rstrip("/")))
+    svc_host = os.environ.get("HOMELAB_SERVICES_HOST")
+    svc_root = os.environ.get("HOMELAB_SERVICES_ROOT")
+    if svc_host and svc_root:
+        pairs.append((svc_host.rstrip("/"), svc_root.rstrip("/")))
+    for host_prefix, runtime_prefix in pairs:
+        if s == host_prefix or s.startswith(host_prefix + "/"):
+            return Path(runtime_prefix + s[len(host_prefix) :])
+    return p
+
+
 def control_mode() -> str:
     """container (default in image) or git (host checkout)."""
     env = os.environ.get("HOMELAB_CONTROL_MODE")
