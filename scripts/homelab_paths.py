@@ -41,14 +41,14 @@ def data_root() -> Path:
 
 
 def services_root() -> Path:
+    env = os.environ.get("HOMELAB_SERVICES_ROOT")
+    if env:
+        return Path(env)
     data = data_root()
     manifest = _load_manifest(data)
     paths = manifest.get("paths") or {}
     if paths.get("services_root"):
         return Path(str(paths["services_root"]))
-    env = os.environ.get("HOMELAB_SERVICES_ROOT")
-    if env:
-        return Path(env)
     return Path("/var/lib/homelab/services")
 
 
