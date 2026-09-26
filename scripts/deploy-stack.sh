@@ -103,9 +103,6 @@ fi
 if [[ "$STACK" == "scrutiny" ]]; then
   python3 "${REPO_ROOT}/scripts/render-scrutiny-config.py"
 fi
-if [[ "$STACK" == "backrest" ]]; then
-  python3 "${REPO_ROOT}/scripts/render-backrest-config.py"
-fi
 if [[ "$STACK" == "sre" ]]; then
   mkdir -p "${SERVICES_ROOT}/sre/data"
 fi
@@ -180,5 +177,8 @@ fi
 if [[ "$STACK" == "cleanuparr" ]]; then
   # Idempotent: queue cleaner delete_private + Pushover (same destination as Radarr).
   python3 "${REPO_ROOT}/scripts/apply-cleanuparr-config.py"
+fi
+if [[ "$STACK" == "backrest" ]]; then
+  python3 "${REPO_ROOT}/scripts/apply-backrest-config.py"
 fi
 echo "Deployed $STACK"
