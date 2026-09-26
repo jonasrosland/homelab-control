@@ -35,6 +35,20 @@ else
   echo "Unknown stack: $STACK" >&2
   exit 1
 fi
+
+if [[ "$STACK" == "homelab-control" ]]; then
+  python3 "${REPO_ROOT}/scripts/render-homelab-control-env.py"
+  ENV_FILE="${REPO_ROOT}/stacks/homelab-control/.generated.env"
+  COMPOSE=(docker compose -f "${REPO_ROOT}/stacks/homelab-control/docker-compose.yml" --env-file "${ENV_FILE}")
+  "${COMPOSE[@]}" pull scheduler
+  "${COMPOSE[@]}" up -d scheduler
+  if [[ -f "${REPO_ROOT}/scripts/disable-host-schedulers.sh" ]]; then
+    bash "${REPO_ROOT}/scripts/disable-host-schedulers.sh"
+  fi
+  echo "Deployed homelab-control scheduler"
+  exit 0
+fi
+
 if [[ "$STACK" == "litellm" ]]; then
   python3 "${REPO_ROOT}/scripts/render-litellm-env.py"
 fi
@@ -44,7 +58,6 @@ if [[ "$STACK" == "llmster" ]]; then
   # shellcheck source=/dev/null
   source "${REPO_ROOT}/.generated/llmster.build.env"
   set +a
-  bash "${REPO_ROOT}/scripts/install-llmster-update-timer.sh"
 fi
 if [[ "$STACK" == "mayberry" ]]; then
   python3 "${REPO_ROOT}/scripts/render-mayberry-build.py"
@@ -153,9 +166,6 @@ PY
 python3 "${CONTROL_ROOT}/scripts/wait-stack-healthy.py" --stack "$STACK" --timeout "${HEALTH_TIMEOUT}"
 if [[ "$STACK" == "scrutiny" ]]; then
   "${REPO_ROOT}/scripts/fix-scrutiny-perms.sh"
-fi
-if [[ "$STACK" == "backrest" ]]; then
-  bash "${REPO_ROOT}/scripts/install-restic-timers.sh"
 fi
 if [[ "$STACK" == "recyclarr" ]]; then
   # Cron container stays up; run an immediate sync after deploy.
