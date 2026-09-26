@@ -1,9 +1,0 @@
-[Unit]
-Description=Weekly restic repository check
-After=network-online.target
-
-[Service]
-Type=oneshot
-WorkingDirectory=/opt/homelab/control
-Environment=HOMELAB_DATA_ROOT=/opt/homelab/data
-ExecStart=/usr/bin/python3 /opt/homelab/control/scripts/restic-run.py check
