@@ -6,14 +6,19 @@ FROM docker:27.4.1-cli AS dockercli
 
 FROM python:3.12-slim-bookworm
 
+ARG RESTIC_VERSION=0.18.1
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     bash \
+    bzip2 \
     ca-certificates \
+    curl \
     git \
     openssh-client \
-    restic \
     rclone \
+  && curl -fsSL "https://github.com/restic/restic/releases/download/v${RESTIC_VERSION}/restic_${RESTIC_VERSION}_linux_amd64.bz2" \
+    | bunzip2 > /usr/local/bin/restic \
+  && chmod 755 /usr/local/bin/restic \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker

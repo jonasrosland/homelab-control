@@ -54,7 +54,7 @@ def restic_binary(cfg: dict) -> Path:
     found = shutil.which("restic")
     if found:
         return Path(found)
-    return Path("/usr/bin/restic")
+    return Path("/usr/local/bin/restic")
 
 
 def restic_cmd(cfg: dict, *args: str) -> list[str]:
