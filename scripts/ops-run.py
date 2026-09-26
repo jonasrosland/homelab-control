@@ -63,27 +63,24 @@ def process() -> int:
         running = path.with_name(path.name.replace("pending-", "running-", 1))
         path.rename(running)
         try:
-            print(f"+ restic backup --no-forget ({path.name})", flush=True)
+            print(f"+ Backrest manual backup ({path.name})", flush=True)
             subprocess.run(
                 [
                     "python3",
-                    str(ROOT / "scripts" / "restic-run.py"),
-                    "backup",
-                    "--no-forget",
-                    "--tag",
-                    "trigger:manual",
+                    str(ROOT / "scripts" / "trigger-backrest-backup.py"),
+                    "manual",
                 ],
                 check=True,
                 cwd=str(ROOT),
             )
             running.rename(running.with_name(running.name.replace("running-", "done-", 1)))
-            telegram_notify(f"{hp.notify_prefix()}restic backup (from Telegram Allow) finished.")
+            telegram_notify(f"{hp.notify_prefix()}Backrest backup (from Telegram Allow) finished.")
         except Exception as exc:
             code = 1
             failed = running.with_name(running.name.replace("running-", "failed-", 1))
             running.rename(failed)
             telegram_notify(
-                f"{hp.notify_prefix()}restic backup from Telegram failed: {exc}"[:3500]
+                f"{hp.notify_prefix()}Backrest backup from Telegram failed: {exc}"[:3500]
             )
     return code
 

@@ -379,12 +379,12 @@ def pre_deploy_backup(cfg: dict, stacks: list[str], *, notify: bool = True) -> N
     if not cfg.get("pre_deploy_backup", True):
         return
     names = ", ".join(stacks)
-    print(f"+ restic backup before deploy ({names})", flush=True)
+    print(f"+ Backrest backup before deploy ({names})", flush=True)
     notify_cfg = cfg.get("notify") or {}
     if notify and notify_cfg.get("on_success") == "telegram":
-        telegram_notify(cfg, f"{hp.notify_prefix(cfg)}restic backup before deploy ({names})")
+        telegram_notify(cfg, f"{hp.notify_prefix(cfg)}Backrest backup before deploy ({names})")
     subprocess.run(
-        ["python3", str(hp.control_script("restic-run.py")), "backup", "--no-forget"],
+        ["python3", str(hp.data_script("trigger-backrest-backup.py")), "predeploy"],
         check=True,
         env=_sub_env(),
         cwd=_data(),
@@ -500,7 +500,7 @@ def main() -> int:
         save_pending(cfg, new_head, to_deploy)
         if same_sha_retry:
             print(
-                f"skip pre-deploy restic (pending retry of {new_head[:8]})",
+                f"skip pre-deploy Backrest backup (pending retry of {new_head[:8]})",
                 flush=True,
             )
         else:

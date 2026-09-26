@@ -303,12 +303,13 @@ def run_dump_restore(job: dict) -> None:
     dump.parent.mkdir(parents=True, exist_ok=True)
 
     telegram_notify(
-        f"{hp.notify_prefix()}major upgrade #{pr} — restic + dump {container} "
+        f"{hp.notify_prefix()}major upgrade #{pr} — Backrest + dump {container} "
         f"(service {db_service})"
     )
     subprocess.run(
-        ["python3", str(hp.control_script("restic-run.py")), "backup", "--no-forget"],
+        ["python3", str(hp.data_script("trigger-backrest-backup.py")), "predeploy"],
         check=True,
+        cwd=str(ROOT),
         env={**os.environ, "HOMELAB_DATA_ROOT": str(ROOT)},
     )
     dump_postgres(container, dump)
