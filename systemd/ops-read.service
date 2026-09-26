@@ -1,9 +1,0 @@
-[Unit]
-Description=Read-only ops HTTP socket for SRE bot (data-plane script)
-After=network.target
-
-[Service]
-Type=simple
-WorkingDirectory=/opt/homelab/data
-Environment=HOMELAB_DATA_ROOT=/opt/homelab/data
-ExecStart=/usr/bin/python3 /opt/homelab/data/scripts/ops-read.py
