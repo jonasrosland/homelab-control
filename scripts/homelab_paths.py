@@ -69,8 +69,26 @@ def resolve_data(p: str | Path) -> Path:
     return data_root() / path
 
 
+def control_root() -> Path:
+    """Checkout of homelab-control (this repo when deployed from control)."""
+    env = os.environ.get("HOMELAB_CONTROL_ROOT")
+    if env:
+        return Path(env).resolve()
+    try:
+        data = data_root()
+        manifest = _load_manifest(data)
+        cr = (manifest.get("paths") or {}).get("control_root")
+        if cr:
+            path = Path(str(cr))
+            if path.is_dir():
+                return path.resolve()
+    except RuntimeError:
+        pass
+    return CONTROL_ROOT
+
+
 def control_script(name: str) -> Path:
-    return CONTROL_ROOT / "scripts" / name
+    return control_root() / "scripts" / name
 
 
 def data_script(name: str) -> Path:

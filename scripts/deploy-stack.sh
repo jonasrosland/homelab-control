@@ -13,6 +13,9 @@ CONTROL_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DATA_ROOT="${HOMELAB_DATA_ROOT:-$CONTROL_ROOT}"
 REPO_ROOT="$DATA_ROOT"
 export HOMELAB_DATA_ROOT="$DATA_ROOT"
+if [[ -z "${SERVICES_ROOT:-}" ]]; then
+  SERVICES_ROOT="$(PYTHONPATH="${CONTROL_ROOT}/scripts" python3 -c "import homelab_paths as hp; print(hp.services_root())" 2>/dev/null || true)"
+fi
 SERVICES_ROOT="${SERVICES_ROOT:-/var/lib/homelab/services}"
 REPO_STACK="${REPO_ROOT}/stacks/${STACK}"
 DIR="${SERVICES_ROOT}/${STACK}"

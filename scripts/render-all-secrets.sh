@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 # Re-decrypt all config/secrets/* into /run/homelab (after reboot / before deploy).
 set -euo pipefail
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$ROOT"
-python3 - <<'PY'
-from pathlib import Path
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+DATA_ROOT="$("${SCRIPT_DIR}/homelab-data-root.sh")"
+export HOMELAB_DATA_ROOT="${DATA_ROOT}"
+cd "${DATA_ROOT}"
+PYTHONPATH="${SCRIPT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" python3 - <<'PY'
 import sys
 
-ROOT = Path(__file__).resolve().parents[1] if False else Path(".").resolve()
-sys.path.insert(0, str(ROOT / "scripts"))
-from sops_secrets import decrypt_to, ensure_runtime, secrets_path, SECRETS_DIR  # noqa: E402
+from sops_secrets import decrypt_to, ensure_runtime, SECRETS_DIR  # noqa: E402
 
 ensure_runtime()
 if not SECRETS_DIR.is_dir():

@@ -22,7 +22,7 @@ import homelab_paths as hp
 
 ROOT = hp.data_root()
 SOPS_CFG = ROOT / "config" / "sops.yml"
-SOPS_RUN = hp.CONTROL_ROOT / "scripts" / "sops-run.sh"
+SOPS_RUN = hp.control_script("sops-run.sh")
 SECRETS_DIR = ROOT / "config" / "secrets"
 
 

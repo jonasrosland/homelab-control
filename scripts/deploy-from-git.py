@@ -26,6 +26,51 @@ def load_cfg() -> dict:
     return yaml.safe_load((hp.data_root() / "config" / "deploy.yml").read_text())
 
 
+def _homelab_manifest() -> dict:
+    for name in ("homelab.yml", "homelab.yaml"):
+        path = hp.data_root() / "config" / name
+        if path.is_file():
+            raw = yaml.safe_load(path.read_text()) or {}
+            return raw if isinstance(raw, dict) else {}
+    return {}
+
+
+def verify_control_pin() -> None:
+    """Ensure control checkout matches homelab.yml paths and optional git.control_ref."""
+    manifest = _homelab_manifest()
+    paths = manifest.get("paths") or {}
+    want_root = paths.get("control_root")
+    if want_root:
+        want_p = Path(str(want_root)).resolve()
+        here = hp.control_root().resolve()
+        if want_p.is_dir() and here != want_p:
+            raise RuntimeError(
+                f"control checkout is {here} but config/homelab.yml "
+                f"paths.control_root is {want_p}"
+            )
+    ref = str((manifest.get("git") or {}).get("control_ref") or "").strip()
+    if not ref:
+        return
+    cr = hp.control_root()
+    head = subprocess.run(
+        ["git", "-C", str(cr), "rev-parse", "HEAD"],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout.strip()
+    want_sha = subprocess.run(
+        ["git", "-C", str(cr), "rev-parse", ref],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout.strip()
+    if head != want_sha:
+        raise RuntimeError(
+            f"homelab.yml git.control_ref {ref!r} → {want_sha[:8]} "
+            f"but control checkout is {head[:8]}"
+        )
+
+
 def _data() -> Path:
     return hp.data_root()
 
@@ -344,6 +389,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     cfg = load_cfg()
+    verify_control_pin()
     lock = acquire_lock(resolve(cfg.get("lock_file") or ".generated/deploy.lock"))
     if lock is None:
         print("deploy-from-git already running")
