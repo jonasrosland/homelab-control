@@ -1,6 +1,6 @@
 # DEP-003 — Backrest integration (control plane)
 
-**Status:** approved design — not yet implemented in control or data template.
+**Status:** phase A/B implemented (derived client, template stack, Saturn `integrations.backrest`). Legacy `config/backrest.yml` optional fallback until phase D.
 
 ## Goal
 

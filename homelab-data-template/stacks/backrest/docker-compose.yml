@@ -1,0 +1,39 @@
+# Backrest — add repo in UI once; config.json on services volume is SSOT (DEP-003).
+name: backrest
+
+x-homelab:
+  version: 1
+  placement: saturn
+  publish:
+    - service: backrest
+      port: 9898
+  config:
+    secrets:
+      - config/secrets/rclone.conf
+      - config/secrets/restic-password
+  integrations:
+    backrest:
+      repo_id: default
+      plans:
+        predeploy: homelab-predeploy
+        manual: homelab-manual
+      config:
+        service: backrest
+        env: BACKREST_CONFIG
+
+services:
+  backrest:
+    image: ghcr.io/garethgeorge/backrest:v1.14.1
+    container_name: backrest
+    restart: unless-stopped
+    ports:
+      - "9898:9898"
+    environment:
+      BACKREST_DATA: /data
+      BACKREST_CONFIG: /config/config.json
+      RCLONE_CONFIG: /rclone/rclone.conf
+    volumes:
+      - ${HOMELAB_SERVICES_HOST:?}/backrest/data:/data
+      - ${HOMELAB_SERVICES_HOST:?}/backrest/config:/config
+      - ${HOMELAB_SERVICES_HOST:?}/backrest/cache:/cache
+      - /run/homelab/rclone.conf:/rclone/rclone.conf:ro
