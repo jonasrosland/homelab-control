@@ -55,6 +55,7 @@ Telegram and log prefixes use `notify.host_label` in `config/homelab.yml` or `HO
 
 - [Control vs data plane](docs/control-data-plane.md)
 - [DEP-002 boot secrets](docs/DEP-002-boot-secrets.md)
+- [DEP-003 Backrest integration](docs/DEP-003-backrest-integration.md)
 - [Deploy observability](docs/deploy-observability.md)
 - [Why build this](docs/whydidibuildthis.md)
 
