@@ -19,7 +19,7 @@ COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
 COPY --from=dockercli /usr/local/libexec/docker/cli-plugins/docker-compose \
   /usr/local/libexec/docker/cli-plugins/docker-compose
 
-RUN pip install --no-cache-dir pyyaml \
+RUN pip install --no-cache-dir pyyaml jsonschema==4.23.0 \
   && mkdir -p /home/runner \
   && echo "runner:x:1000:1000:runner:/home/runner:/bin/bash" >> /etc/passwd \
   && chown -R 1000:1000 /home/runner
