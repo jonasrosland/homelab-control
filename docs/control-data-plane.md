@@ -13,6 +13,17 @@ Related: [deploy-observability.md](./deploy-observability.md), [whydidibuildthis
 
 **Rule of thumb:** if it mentions your LAN domain, site-specific mount paths, a VMID, or an API token, it is data plane. If it implements “pull git → backup → compose → health → notify,” it is control plane.
 
+### Reusability (non-negotiable)
+
+**homelab-control MUST run for any operator** who supplies their own data checkout (or `homelab-data-template/`) and host paths in `config/homelab.yml`. The control image and scripts MUST NOT:
+
+- import or require modules from a specific private data repo (e.g. site stack registries);
+- `exec` data-repo orchestration that duplicates control responsibilities (boot-secrets belongs in control; data supplies `config/boot-secrets.yml` lists only).
+
+Data-plane repos MAY generate those YAML manifests from local conventions (CI sync from `x-homelab`, etc.); that logic stays in the data repo and is not a runtime dependency of control.
+
+See [DEP-002-boot-secrets.md](./DEP-002-boot-secrets.md).
+
 ## Current layout (monorepo)
 
 ```
@@ -124,7 +135,7 @@ Include:
 
 - `scripts/deploy-from-git.py`, `deploy-stack.sh` (eventually generic driver)
 - `scripts/wait-stack-healthy.py`, `docker_health.py`
-- `scripts/sops_secrets.py`, `sops-encrypt.sh`, `age-run.sh`, `render-all-secrets.sh` (framework)
+- `scripts/sops_secrets.py`, `sops-encrypt.sh`, `age-run.sh`, `render-all-secrets.sh`, `boot-secrets.sh`, `run-boot-secrets-renders.py` (framework)
 - `scripts/restic-run.py` (generic); **exclude** site `restic/restic.yml` or ship `restic.example.yml`
 - `systemd/*` templates with `EnvironmentFile=` pointing at `homelab.yml` paths
 - `docs/`, generic blog posts, `whydidibuildthis.md`, `deploy-observability.md`
