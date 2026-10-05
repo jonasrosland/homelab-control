@@ -1,67 +1,23 @@
 #!/usr/bin/env python3
-"""Backrest HTTP API (DEP-003 derived config; legacy config/backrest.yml fallback)."""
+"""Backrest HTTP API (DEP-003 derived config from x-homelab)."""
 from __future__ import annotations
 
 import json
-import os
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
 
-try:
-    import yaml
-except ImportError:
-    yaml = None  # type: ignore
-
-_DATA = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import backrest_integration as bi  # noqa: E402
-import homelab_paths as hp  # noqa: E402
-
-
-def _load_legacy_backrest_yaml() -> dict:
-    if yaml is None:
-        raise RuntimeError("PyYAML required")
-    root = Path(os.environ.get("HOMELAB_DATA_ROOT", _DATA))
-    path = root / "config" / "backrest.yml"
-    if not path.is_file():
-        raise FileNotFoundError(path)
-    return yaml.safe_load(path.read_text()) or {}
-
-
-def _legacy_api_config() -> dict:
-    br = _load_legacy_backrest_yaml()
-    api = br.get("api") or {}
-    plans = api.get("plans") or {}
-    primary = str(api.get("url") or "http://host.docker.internal:9898").rstrip("/")
-    fallbacks = [str(u).rstrip("/") for u in (api.get("fallback_urls") or []) if u]
-    urls = [primary] + [u for u in fallbacks if u != primary]
-    return {
-        "url": primary,
-        "urls": urls,
-        "timeout_seconds": int(api.get("timeout_seconds") or 3600),
-        "repo_id": str(br.get("repo_id") or api.get("repo_id") or "gdrive-homelab"),
-        "predeploy_plan": str(plans.get("predeploy") or "homelab-predeploy"),
-        "manual_plan": str(plans.get("manual") or "homelab-manual"),
-    }
 
 
 def api_config() -> dict:
-    try:
-        return bi.derived_api_config()
-    except (FileNotFoundError, ValueError, RuntimeError):
-        return _legacy_api_config()
+    return bi.derived_api_config()
 
 
 def config_json_path() -> Path:
-    try:
-        return bi.config_json_path()
-    except (FileNotFoundError, ValueError, RuntimeError):
-        br = _load_legacy_backrest_yaml()
-        return hp.host_path_to_runtime(
-            Path(br.get("config_path") or "/var/lib/homelab/services/backrest/config/config.json")
-        )
+    return bi.config_json_path()
 
 
 def _post(path: str, body: dict, *, timeout: int) -> bytes:

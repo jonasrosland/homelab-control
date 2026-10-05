@@ -1,6 +1,6 @@
 # DEP-003 — Backrest integration (control plane)
 
-**Status:** phase A/B implemented (derived client, template stack, Saturn `integrations.backrest`). Legacy `config/backrest.yml` optional fallback until phase D.
+**Status:** complete (derived client, template stack, no legacy `backrest.yml` / restic policy compile on Saturn).
 
 ## Goal
 
@@ -146,10 +146,8 @@ Phased deprecation of migration-only layers:
 |-------|--------|
 | A | Land DEP-003 + control client derivation; dual-run tests against derived URLs vs legacy `backrest.yml`. |
 | B | Add `integrations.backrest` to `stacks/backrest/docker-compose.yml`; replace `/tank` binds with `services_root` rendering. |
-| C | Remove boot/deploy dependency on `render-backrest-config.py` / `apply-backrest-config.py` when JSON SSOT stable; drop `config/restic.yml` policy compile. |
-| D | Delete `config/backrest.yml`; fold any remaining URLs into derived config only. |
-
-Until phase C, existing render scripts **MAY** remain on Saturn as data-plane-only debt.
+| C | Done — removed render/apply compile; `config/restic-prepare.yml` for SQL/stack copy only. |
+| D | Done — deleted `config/backrest.yml`; client uses derived config only. |
 
 ## Requirements index (future)
 
