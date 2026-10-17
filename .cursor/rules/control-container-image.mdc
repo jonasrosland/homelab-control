@@ -1,0 +1,14 @@
+---
+description: homelab-control Dockerfile and bundled tool images
+globs: Dockerfile,stacks/**
+alwaysApply: false
+---
+
+# Control container image
+
+- **`Dockerfile`**: engine entrypoint, baked **`/opt/homelab/control`** — version via **`docs/release.md`** / GitHub release workflow.
+- **`stacks/age/`** and similar: small helper images referenced from data-plane **`config/images.yml`** — keep tags pinned; push via data repo **`scripts/push-homelab-image.py`** after build.
+
+Rebuild and test the control image after script changes that ship in the image. Saturn pins **`config/homelab.yml` → `control.image`** — image bumps are a **data-plane config change**, not silent host rebuilds.
+
+Do not embed site secrets or `config/secrets/` in the control image build context.

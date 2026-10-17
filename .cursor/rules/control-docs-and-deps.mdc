@@ -1,0 +1,14 @@
+---
+description: DEP-* design docs and control-plane requirements
+globs: docs/**
+alwaysApply: false
+---
+
+# Control design (DEP-*)
+
+Normative deploy engine rules live here as **DEP-*** docs (e.g. DEP-002 boot-secrets, DEP-004 deploy-stack driver, DEP-005 plane split).
+
+- Data-plane copies with CFG IDs may live under **homelab-config** `docs/design/homelab-control/` — keep behavior and docs aligned in the same change when both repos move.
+- Boot-secrets: control runs renders; data supplies **`config/boot-secrets.yml`** lists only (no data-repo orchestration in control).
+
+When changing documented **MUST** behavior, update the DEP doc and homelab-config contract tests that reference it in the data PR (or paired PRs).
