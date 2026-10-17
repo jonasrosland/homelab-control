@@ -2,6 +2,8 @@
 
 Control-plane repo only. Site stacks and secrets are in the **data plane** (your private repo).
 
+**Cursor:** Glob rules in **`.cursor/rules/`** (`scripts/**`, `docs/**`, `Dockerfile`, `stacks/**`) — generic engine only; site policy stays in homelab-config.
+
 ## Paths
 
 - `HOMELAB_DATA_ROOT` — git checkout with `config/deploy.yml` and `stacks/` (required when control and data are separate).

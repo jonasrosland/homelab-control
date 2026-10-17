@@ -1,0 +1,27 @@
+---
+description: homelab-control engine scripts — generic deploy/SOPS, no site data
+globs: scripts/**
+alwaysApply: false
+---
+
+# Control-plane scripts
+
+This repo is **control only** — no LAN DNS, VMIDs, site domains, or private stack lists (`docs/control-data-plane.md`).
+
+## MUST
+
+- Keep the engine **data-root agnostic**: resolve paths via **`scripts/homelab_paths.py`** and **`HOMELAB_DATA_ROOT`** (data checkout with `config/deploy.yml`, `stacks/`).
+- Site-specific deploy branches belong in the **data repo** (`deploy_stack_driver.py`, `x-homelab`), not new hardcoded stack names in **`deploy-stack.sh`** (DEP-004).
+- **MUST NOT** import or require modules from a specific private data repo at runtime.
+
+## Test locally
+
+From this repo with a data checkout:
+
+```bash
+HOMELAB_DATA_ROOT=/path/to/homelab-config python3 scripts/deploy-from-git.py --help
+```
+
+Use **Docker / homelab-control image** on Saturn for production; dev **may** use host Python here for engine hacking only — not for Saturn poller operations.
+
+After image changes: rebuild control image per **`docs/release.md`**; bump data repo **`control.image`** / **`control.release`** when pinned.
